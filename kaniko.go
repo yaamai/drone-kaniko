@@ -25,6 +25,7 @@ type (
 		AutoTagSuffix    string   // Suffix to append to the auto detect tags
 		ExpandTag        bool     // Set this to expand the `Tags` into semver-tagged labels
 		Args             []string // Docker build args
+		ArgsEnv          []string // Docker build args from env
 		Target           string   // Docker build target
 		Repo             string   // Docker build repository
 		Mirrors          []string // Docker repository mirrors
@@ -168,7 +169,11 @@ func (p Plugin) Exec() error {
 
 	// Set the build arguments
 	for _, arg := range p.Build.Args {
-		cmdArgs = append(cmdArgs, fmt.Sprintf("--build-arg=%s", arg))
+		cmdArgs = append(cmdArgs, fmt.Sprintf("--build-args=%s", arg))
+	}
+	// Set the build arguments from env
+	for _, arg := range p.Build.ArgsEnv {
+		cmdArgs = append(cmdArgs, fmt.Sprintf("--build-arg=%s=%s", arg, os.Getenv(strings.ToUpper(arg))))
 	}
 	// Set the labels
 	for _, label := range p.Build.Labels {

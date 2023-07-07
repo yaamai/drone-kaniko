@@ -1,5 +1,14 @@
+FROM golang:1.19 AS builder
+RUN mkdir /work
+COPY . /work
+RUN \
+  cd /work &&\
+  go test ./... &&\
+  export CGO_ENABLED=0 &&\
+  GOOS=linux GOARCH=amd64 go build -o release/linux/amd64/kaniko-docker ./cmd/kaniko-docker
+
 FROM gcr.io/kaniko-project/executor:v1.9.1
 
 ENV KANIKO_VERSION=1.9.1
-ADD release/linux/amd64/kaniko-docker /kaniko/
+COPY --from=builder /work/release/linux/amd64/kaniko-docker /kaniko/
 ENTRYPOINT ["/kaniko/kaniko-docker"]

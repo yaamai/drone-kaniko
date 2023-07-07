@@ -40,6 +40,7 @@ type (
 		Platform         string   // Allows to build with another default platform than the host, similarly to docker build --platform
 		SkipUnusedStages bool     // Build only used stages
 		TarPath          string   // Set this flag to save the image as a tarball at path
+		InsecureRegistry []string // Set this to allow insecure registries
 	}
 
 	// Artifact defines content of artifact file
@@ -224,7 +225,11 @@ func (p Plugin) Exec() error {
 	if p.Build.TarPath != "" {
 		cmdArgs = append(cmdArgs, fmt.Sprintf("--tar-path=%s", p.Build.TarPath))
 	}
-	
+
+	for _, registry := range p.Build.InsecureRegistry {
+		cmdArgs = append(cmdArgs, fmt.Sprintf("--insecure-registry=%s", registry))
+	}
+
 	cmd := exec.Command("/kaniko/executor", cmdArgs...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

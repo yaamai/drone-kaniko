@@ -154,6 +154,8 @@ func (p Plugin) Exec() error {
 	}
 
 	cmdArgs := []string{
+		"--compressed-caching=false",
+		"--use-new-run",
 		fmt.Sprintf("--dockerfile=%s", p.Build.Dockerfile),
 		fmt.Sprintf("--context=dir://%s", p.Build.Context),
 	}
